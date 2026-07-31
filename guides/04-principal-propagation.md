@@ -21,7 +21,7 @@ This is **Phase 2** of *"MCP Gateway — user authentication with SAP Cloud Iden
 
 ## Architecture
 
-![Part 4 — end-to-end principal propagation authentication flow: the signed-in Copilot Studio user's identity is federated through Entra ID and SAP IAS, forwarded by the MCP Gateway as an IAS bearer token, turned into a short-lived per-user X.509 certificate by the Cloud Connector, and mapped to the real ABAP user by CERTRULE on the on-prem SAP system.](../assets/architecture-pp-flow.svg)
+![Part 4 — end-to-end principal propagation authentication flow: the signed-in Copilot Studio user authenticates against SAP IAS, which brokers the login to Microsoft Entra ID as the federated corporate IdP; IAS issues the bearer JWT that the MCP Gateway validates and forwards, the Cloud Connector turns the user's mail into a short-lived per-user X.509 certificate, and CERTRULE maps it to the real ABAP user on the on-prem SAP system.](../assets/architecture-pp-flow.svg)
 
 ```
 Copilot Studio ─▶ MCP Gateway (Integration Suite / Integration Cell) ─▶ BTP Destination ─▶ Cloud Connector ─▶ on-prem SAP
@@ -29,7 +29,7 @@ Copilot Studio ─▶ MCP Gateway (Integration Suite / Integration Cell) ─▶ 
                     forwards it as SAP-Connectivity-Authentication         (X.509)                per-user X.509 cert         + CERTRULE → real ABAP user
 ```
 
-- **Front end (unchanged):** Copilot Studio → Entra ID OAuth → **IAS** token exchange → MCP Gateway validates the IAS JWT and reads the user's **`mail`**.
+- **Front end (unchanged):** Copilot Studio → **IAS** (OAuth authorize) → IAS brokers the login to **Entra ID** (federated corporate IdP) → IAS issues the bearer JWT → MCP Gateway validates the IAS JWT and reads the user's **`mail`**.
 - **BTP Destination:** an **OnPremise** destination whose `Authentication` starts as **BasicAuthentication** (Part A) and is later switched to **PrincipalPropagation** (Part B). Only this one property changes between the two parts.
 - **Cloud Connector (CC):** exposes the on-prem SAP system under an internal **virtual host**. For principal propagation it mints a **short-lived per-user X.509 certificate** (subject = the user's `mail`), signed by its **Principal Propagation CA**, and presents its own **System Certificate** to the backend over mutual TLS.
 - **On-prem SAP (ICM + ABAP):** trusts the CC as a **trusted reverse proxy**, accepts the forwarded per-user certificate, and maps it to an ABAP user with **rule-based certificate mapping (CERTRULE)** on the `E-Mail` attribute.
