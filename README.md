@@ -28,3 +28,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - [`principal-propagation.http`](./http/principal-propagation.http) — REST Client snippets to verify the backend (Basic-Auth foil) and the gateway calls (Part 4).
 
 > The `.http` files ship with **placeholders only** — never commit real client secrets or authorization codes.
+
+## License
+
+Licensed under the [MIT License](./LICENSE).
