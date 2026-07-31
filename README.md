@@ -4,6 +4,8 @@ A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through 
 
 Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**.
 
+> The principal-propagation / SSO steps shown here aren't limited to the MCP Gateway — the same identity chain (SAP IAS → Cloud Connector → X.509 → real ABAP user) applies to **any service running on SAP BTP** that fronts an on-premise backend. Using **SAP API Management** (with the **Integration Cell**) instead of the MCP Gateway would be another obvious choice.
+
 | # | Guide | What it adds | Identity at the gateway | Video |
 |---|---|---|---|---|
 | 1 | [MCP Gateway on SAP Integration Suite](./guides/01-integration-suite.md) | Build the MCP server; connect via **Azure API Management** using `client_credentials` | Shared technical account | [▶️ watch](https://youtu.be/1m12OVONavA) |
