@@ -21,6 +21,8 @@ This is **Phase 2** of *"MCP Gateway — user authentication with SAP Cloud Iden
 
 ## Architecture
 
+![Part 4 — end-to-end principal propagation authentication flow: the signed-in Copilot Studio user's identity is federated through Entra ID and SAP IAS, forwarded by the MCP Gateway as an IAS bearer token, turned into a short-lived per-user X.509 certificate by the Cloud Connector, and mapped to the real ABAP user by CERTRULE on the on-prem SAP system.](../assets/architecture-pp-flow.svg)
+
 ```
 Copilot Studio ─▶ MCP Gateway (Integration Suite / Integration Cell) ─▶ BTP Destination ─▶ Cloud Connector ─▶ on-prem SAP
   (end user)        validates IAS token, reads `mail`,                    PrincipalPropagation    mints a short-lived        ICM (mutual TLS)

@@ -28,6 +28,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - [`verify-step1-discovery.http`](./http/verify-step1-discovery.http) · [`verify-step2-ias-token.http`](./http/verify-step2-ias-token.http) — REST Client snippets to verify the IAS flow (Part 3).
 - [`api-business-partner-openapi.yaml`](./openapi/api-business-partner-openapi.yaml) — the OpenAPI subset used to generate the MCP tools for the on-prem `API_BUSINESS_PARTNER` backend (Part 4).
 - [`principal-propagation.http`](./http/principal-propagation.http) — REST Client snippets to verify the backend (Basic-Auth foil) and the gateway calls (Part 4).
+- [`architecture-pp-flow.svg`](./assets/architecture-pp-flow.svg) — sequence diagram of the Part 4 end-to-end principal-propagation authentication flow.
 
 > The `.http` files ship with **placeholders only** — never commit real client secrets or authorization codes.
 
