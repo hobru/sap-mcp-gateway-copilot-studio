@@ -1,0 +1,120 @@
+### MCP Gateway on SAP Integration Suite — principal propagation to an on-prem SAP backend
+### Two things to test:
+###   A) The quick foil — call the SAP backend directly with HTTP Basic Authentication
+###      (verifies the service + a technical user; note it always runs as that one user).
+###   B) The goal — call the MCP Gateway with the SAP IAS bearer token obtained via Entra ID.
+###      Once principal propagation is wired (Part B of the guide), the backend runs the call
+###      as the REAL end user. Same IAS token flow as: mcp-gateway-entra-id-copilot-studio.md
+###
+### Run with the VS Code REST Client extension.
+### Fill in the placeholders (<...>) with your own values. Never commit real
+### credentials or IAS tokens.
+
+########################################################################
+### A) Stage 0/2 — call the SAP backend (HE4, client 400) directly with Basic Auth
+########################################################################
+
+@backend = https://<your-sap-backend-host>:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER
+@backendUser = <technical ABAP user>
+@backendPass = <that user's password>
+
+### A1. List the first 5 business partners
+# The REST Client encodes "user:pass" after "Basic " for you.
+# @name backendBP
+GET {{backend}}/A_BusinessPartner?$top=5&$format=json&sap-client=400
+Authorization: Basic {{backendUser}}:{{backendPass}}
+Accept: application/json
+
+### A2. Get a single business partner by key (replace with a real BP number from A1)
+# @name backendBPByKey
+GET {{backend}}/A_BusinessPartner('1000000')?$format=json&sap-client=400
+Authorization: Basic {{backendUser}}:{{backendPass}}
+Accept: application/json
+
+########################################################################
+### B0) Obtain a SAP IAS access token (for the MCP Gateway calls below)
+###     In the video this comes from the Entra ID -> IAS browser flow (Copilot Studio).
+###     For a scripted check you can use the IAS OIDC endpoints directly.
+########################################################################
+
+@ias = https://<your-ias-tenant>.trial-accounts.ondemand.com
+
+### B0a. Inspect the IAS OpenID configuration (issuer, jwks_uri, token_endpoint)
+###       These values also feed the SAP MCP external-auth policy.
+# @name iasWellKnown
+GET {{ias}}/.well-known/openid-configuration
+Accept: application/json
+
+### B0b. (Optional) Resource-owner password grant against IAS, IF password auth is enabled
+###       for the application. Otherwise get the token via the browser flow as in Video 3.
+@iasClientId = <IAS application client_id>
+@iasClientSecret = <IAS application client_secret>
+@iasUser = <IAS/Entra login email, e.g. user@contoso.onmicrosoft.com>
+@iasUserPass = <that user's password>
+# @name iasToken
+POST {{ias}}/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id={{iasClientId}}&client_secret={{iasClientSecret}}&username={{iasUser}}&password={{iasUserPass}}&scope=openid
+
+########################################################################
+### B) Stage 2/4 — call the MCP Gateway with the SAP IAS bearer token (via Entra ID)
+###    Obtain the IAS access_token exactly as in the previous video:
+###    mcp-gateway-entra-id-copilot-studio.md
+###    With principal propagation configured, the backend runs as the signed-in user.
+########################################################################
+
+# Find this on the Integration Suite tenant (API Management), NOT the CF API host.
+@MCP-Server-URL = <your MCP Server URL, e.g. https://<tenant>.integrationsuite.../business-partner>
+# Use the token from B0b, or paste one obtained from the Copilot Studio / browser flow:
+@iasToken = {{iasToken.response.body.access_token}}
+
+### B1. Initialize the MCP session
+# @name init
+POST {{MCP-Server-URL}}
+Authorization: Bearer {{iasToken}}
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "initialize",
+  "params": {
+    "protocolVersion": "2025-06-18",
+    "capabilities": {},
+    "clientInfo": { "name": "vscode-rest", "version": "1.0" }
+  }
+}
+
+### B2. List the exposed MCP tools (reuses the Mcp-Session-Id from init)
+# @name toolsList
+POST {{MCP-Server-URL}}
+Authorization: Bearer {{iasToken}}
+Content-Type: application/json
+Accept: application/json, text/event-stream
+Mcp-Session-Id: {{init.response.headers.mcp-session-id}}
+
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "tools/list"
+}
+
+### B3. Call the getBusinessPartners tool (runs as the real user once PP is wired)
+# @name callTool
+POST {{MCP-Server-URL}}
+Authorization: Bearer {{iasToken}}
+Content-Type: application/json
+Accept: application/json, text/event-stream
+Mcp-Session-Id: {{init.response.headers.mcp-session-id}}
+
+{
+  "jsonrpc": "2.0",
+  "id": 3,
+  "method": "tools/call",
+  "params": {
+    "name": "getBusinessPartners",
+    "arguments": { "$top": 5, "$format": "json" }
+  }
+}

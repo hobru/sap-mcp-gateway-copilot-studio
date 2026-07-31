@@ -1,0 +1,196 @@
+openapi: 3.0.3
+info:
+  title: SAP S/4HANA Business Partner (A2X) — demo subset
+  description: >-
+    Compact OpenAPI specification for the SAP S/4HANA **Business Partner** OData
+    service (`API_BUSINESS_PARTNER`), trimmed down to just the operations we
+    expose as MCP tools in the demo. The full SAP API is much larger — this
+    subset keeps the MCP server small and easy to follow.
+
+
+    The backend is a **real SAP system** reached through the SAP Integration
+    Suite API artifact, which injects **Basic Authentication** credentials
+    towards the backend (see the accompanying guide). The AI client / Copilot
+    Studio never sees the backend credentials.
+  version: 1.0.0
+servers:
+  - url: https://microsoftintegrationdemo.com:44301/sap/opu/odata/sap/API_BUSINESS_PARTNER
+    description: Demo SAP backend (Business Partner OData service, Basic Auth)
+# Basic Authentication is applied by the Integration Suite API artifact towards
+# the backend, not by the MCP client. Documented here for completeness.
+security:
+  - basicAuth: []
+tags:
+  - name: businesspartner
+    description: Business Partner master data
+paths:
+  /A_BusinessPartner:
+    get:
+      operationId: getBusinessPartners
+      summary: List business partners
+      description: >-
+        Returns a list of business partners. Supports the common OData query
+        options so the AI agent can filter, page, and shape the result.
+      tags:
+        - businesspartner
+      parameters:
+        - $ref: '#/components/parameters/top'
+        - $ref: '#/components/parameters/skip'
+        - $ref: '#/components/parameters/filter'
+        - $ref: '#/components/parameters/select'
+        - $ref: '#/components/parameters/orderby'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/format'
+      responses:
+        '200':
+          description: A collection of business partners.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessPartnerCollectionResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /A_BusinessPartner('{BusinessPartner}'):
+    get:
+      operationId: getBusinessPartner
+      summary: Get a single business partner by key
+      description: Returns a single business partner identified by its key.
+      tags:
+        - businesspartner
+      parameters:
+        - name: BusinessPartner
+          in: path
+          required: true
+          description: The business partner number (key).
+          schema:
+            type: string
+            maxLength: 10
+        - $ref: '#/components/parameters/select'
+        - $ref: '#/components/parameters/format'
+      responses:
+        '200':
+          description: The requested business partner.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessPartnerSingleResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          description: Business partner not found.
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        HTTP Basic Authentication towards the SAP backend. Handled by the
+        Integration Suite API artifact (see guide); not supplied by the MCP
+        client.
+  parameters:
+    top:
+      name: $top
+      in: query
+      required: false
+      description: Number of items to return.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 5000
+    skip:
+      name: $skip
+      in: query
+      required: false
+      description: Number of items to skip.
+      schema:
+        type: integer
+        minimum: 0
+    filter:
+      name: $filter
+      in: query
+      required: false
+      description: OData filter expression, e.g. `LastName eq 'Doe'`.
+      schema:
+        type: string
+    select:
+      name: $select
+      in: query
+      required: false
+      description: Comma-separated list of properties to return.
+      schema:
+        type: string
+    orderby:
+      name: $orderby
+      in: query
+      required: false
+      description: Property to sort by, e.g. `BusinessPartner desc`.
+      schema:
+        type: string
+    count:
+      name: $count
+      in: query
+      required: false
+      description: Return the total count of matching entities.
+      schema:
+        type: boolean
+    format:
+      name: $format
+      in: query
+      required: false
+      description: Response format. Use `json` for JSON payloads.
+      schema:
+        type: string
+        enum:
+          - json
+        default: json
+  responses:
+    Unauthorized:
+      description: Missing or invalid backend credentials.
+  schemas:
+    BusinessPartner:
+      type: object
+      description: A single business partner (subset of properties).
+      properties:
+        BusinessPartner:
+          type: string
+          description: Business partner number (key).
+          maxLength: 10
+        BusinessPartnerCategory:
+          type: string
+          description: '1 = Person, 2 = Organization, 3 = Group.'
+          maxLength: 1
+        BusinessPartnerFullName:
+          type: string
+          maxLength: 81
+        BusinessPartnerName:
+          type: string
+          maxLength: 81
+        FirstName:
+          type: string
+          maxLength: 40
+        LastName:
+          type: string
+          maxLength: 40
+        OrganizationBPName1:
+          type: string
+          maxLength: 40
+        BusinessPartnerIsBlocked:
+          type: boolean
+        CreationDate:
+          type: string
+          description: OData date literal.
+    BusinessPartnerCollectionResponse:
+      type: object
+      properties:
+        d:
+          type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/BusinessPartner'
+    BusinessPartnerSingleResponse:
+      type: object
+      properties:
+        d:
+          $ref: '#/components/schemas/BusinessPartner'
