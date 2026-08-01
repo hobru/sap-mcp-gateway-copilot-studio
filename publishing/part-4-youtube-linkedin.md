@@ -5,7 +5,7 @@ the Part 3 front-end identity (Microsoft Entra ID federated into SAP IAS) and ch
 **backend** to your own on-prem SAP via the SAP Cloud Connector — first a Basic-Auth foil,
 then end-to-end **X.509 principal propagation** so each OData call runs as the real ABAP user.
 
-> The Video 4 YouTube URL is not published yet — replace the `[link]` placeholder before posting.
+> Video 4: `https://youtu.be/x64gVHRdVMQ` (publishes Monday — link is live once the video goes public).
 > Previous parts: Part 1 `https://youtu.be/1m12OVONavA` · Part 2 `https://youtu.be/jE-qlg2vZ6I` · Part 3 `https://youtu.be/7Y4TH2DWIoo`.
 
 ---
@@ -34,7 +34,7 @@ The MCP Gateway remains one of the two integration architectures **endorsed by S
 
 Most of the effort here is **pure SAP configuration** (Cloud Connector + ABAP trust), so I documented every step, every dead end, and every fix in the guide.
 
-▶️ Watch it here: [link]
+▶️ Watch it here: https://youtu.be/x64gVHRdVMQ
 📄 Full step-by-step guide, troubleshooting notes + a VS Code REST Client script in the description.
 
 #SAP #MicrosoftCopilot #CopilotStudio #EntraID #SAPIAS #MCP #IntegrationSuite #PrincipalPropagation #CloudConnector #AgenticAI #CleanCore #SAPBTP

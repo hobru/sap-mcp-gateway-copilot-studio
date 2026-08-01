@@ -2,7 +2,7 @@
 
 Connect **Microsoft Copilot Studio** to **your own on-premise SAP system** through the **MCP Gateway** on Integration Suite — first with a quick **Basic Authentication** foil, then with **end-to-end principal propagation** so every backend OData call runs as the **real ABAP user** behind the Copilot Studio identity.
 
-📺 **Watch the video:** _link to follow_
+📺 **Watch the video:** [https://youtu.be/x64gVHRdVMQ](https://youtu.be/x64gVHRdVMQ)
 
 This is **Phase 2** of *"MCP Gateway — user authentication with SAP Cloud Identity Services (IAS), federated to Microsoft Entra ID"* ([guide](./03-sap-ias.md)). The **front end does not change**: users still sign in through **Entra ID federated into IAS**, and the MCP Gateway still validates the **IAS-issued** token and reads the user's **`mail`** claim. What changes is the **backend**: instead of the anonymous **SWAPI** (Star Wars API) call we now invoke **our own on-prem SAP OData service** (`API_BUSINESS_PARTNER`) through a **Cloud Connector**, and we make the backend run as the **real end user**.
 
