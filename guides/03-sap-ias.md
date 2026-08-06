@@ -148,7 +148,7 @@ IAS Admin → **Applications & Resources → Applications → Create**.
   - **Grant Types**: at minimum **Authorization Code** + **Refresh Token**.
   - **Enforce PKCE (S256): OFF** (Power Platform's generic OAuth2 does not send PKCE).
 - **Subject Name Identifier / Attributes**: ensure **email** is sent (needed as the `mail`/`email` claim and for Phase 2 CN mapping).
-- **Default Identity Provider** = the `Entra ID` corporate IdP from Step 1, so login federates straight to Microsoft (no IAS home-realm prompt).
+- **Conditional Authentication / Default Identity Provider** = the `Entra ID` corporate IdP from Step 1, so login federates straight to Microsoft (no IAS home-realm prompt).
 
 **2.2 — IAS: client secret (this is where the OAuth Client ID is born)**
 - **Application APIs → Client Authentication → Secrets → Add** → copy the generated **Client ID** and the **secret** into your Values table (store the secret locally, never in the repo).
