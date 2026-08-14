@@ -57,7 +57,7 @@ You create **two separate registrations**. They are NOT the same thing — mixin
 | Where | Entra ID (Azure portal) | IAS Admin console |
 | Purpose | Lets **IAS** log users in **via Entra** | The client **Copilot Studio** uses; the **`aud`** the gateway validates |
 | Who is the client? | **IAS** is the client, **Entra** is the IdP | **Copilot Studio** is the client, **IAS** is the IdP |
-| Redirect URI | The **IAS corporate-IdP callback** (IAS shows it) | Copilot Studio's `https://global.consent.azure-apim.net/redirect/generated-path` (added in Step 5) + a temporary `http://localhost:8080/callback` for testing |
+| Redirect URI | The **IAS corporate-IdP callback** (IAS shows it) | Register the wildcard `https://global.consent.azure-apim.net/redirect/**` (added in Step 5) + a temporary `http://localhost:8080/callback` for testing |
 | Secret? | Yes (used inside the IAS corporate-IdP config) | Yes (used by Copilot Studio OAuth) |
 | Key claim it must emit | `email` | (IAS mints this token) `iss` = IAS, `aud` = App-2 client ID, `mail` = corporate email |
 
@@ -81,7 +81,7 @@ Keep these handy — you collect them as you go. Never commit the secrets.
 | IAS tenant host | `<ias-host>` (e.g. `xxxxxxxxx.accounts.ondemand.com`) |
 | Entra tenant ID | `<entra-tenant-id>` |
 | Gateway endpoint | `https://<your-integration-suite-host>/swapi` |
-| Copilot Studio consent redirect (connection-specific) | `https://global.consent.azure-apim.net/redirect/<generated-path>` — copy from Copilot Studio on **Create**; it changes if the connection is recreated (re-add to App-2). Note: **`apim.net`**, *not* `apihub.net`. |
+| Copilot Studio consent redirect (connection-specific) | Register the wildcard `https://global.consent.azure-apim.net/redirect/**` in IAS App-2 — IAS matches `**` to all paths below, so it covers every connection and you **don't** have to re-add it when the connection is recreated. The exact per-connection value Copilot Studio shows on **Create** is `https://global.consent.azure-apim.net/redirect/<generated-path>`. Note: **`apim.net`**, *not* `apihub.net`. |
 | **App-1** (Entra federation) client ID / secret | `<app1-client-id>` / *(store locally)* |
 | IAS corporate-IdP callback URL | `<ias-callback>` (IAS shows this) |
 | **App-2** (IAS) OAuth **Client ID** / secret | `<app2-client-id>` / *(store locally)* |
@@ -144,7 +144,7 @@ Back in the IAS Corporate IdP → **OpenID Connect Configuration**:
 IAS Admin → **Applications & Resources → Applications → Create**.
 - Display name: e.g. `Copilot Studio MCP`, Type: **OpenID Connect**.
 - **Single Sign-On → OpenID Connect Configuration** ("Configure Manually"):
-  - **Redirect URIs**: `http://localhost:8080/callback` (temporary — for the Verify 2 manual test; remove afterward). You add the **Copilot Studio** redirect (`https://global.consent.azure-apim.net/redirect/generated-path` — **`apim.net`, not `apihub.net`**; connection-specific) in **Step 5**, once Copilot Studio generates it on **Create**.
+  - **Redirect URIs**: `http://localhost:8080/callback` (temporary — for the Verify 2 manual test; remove afterward). For **Copilot Studio**, register the wildcard `https://global.consent.azure-apim.net/redirect/**` (**`apim.net`, not `apihub.net`**) — IAS matches `**` to all paths below, so it covers every connection-specific redirect and you won't have to update it when the connection is recreated. (The exact per-connection value Copilot Studio generates on **Create** in **Step 5** looks like `https://global.consent.azure-apim.net/redirect/generated-path`.)
   - **Grant Types**: at minimum **Authorization Code** + **Refresh Token**.
   - **Enforce PKCE (S256): OFF** (Power Platform's generic OAuth2 does not send PKCE).
 - **Subject Name Identifier / Attributes**: ensure **email** is sent (needed as the `mail`/`email` claim and for Phase 2 CN mapping).
@@ -230,7 +230,7 @@ IAS has no custom scopes, so you authorize on claims IAS *does* emit — **not**
    - **Token URL**: `https://<ias-host>/oauth2/token`
    - **Refresh URL**: `https://<ias-host>/oauth2/token` — **same as the Token URL**. IAS has no separate refresh endpoint; refresh uses `grant_type=refresh_token` against `/oauth2/token`.
    - **Scope**: `openid offline_access` — **`offline_access` is required**, or IAS returns no refresh token and silent refresh fails (the *"Refresh Token missing"* warning). Add `groups` only if you configured Step 4 Option B (Entra-sourced groups).
-4. Click **Create**. Copilot Studio generates a **redirect URL** (`https://global.consent.azure-apim.net/redirect/generated-path` — `apim.net`, connection-specific). **Copy it** and register it in **IAS App-2 → Single Sign-On → OpenID Connect Configuration → Redirect URIs**. **Do not touch Entra** — Copilot Studio calls IAS directly, so only IAS needs to trust this redirect (Entra already trusts IAS's callback from Step 1). After any connector/connection edit, **recreate the connection and wait ~1–2 min** (Power Platform caches metadata).
+4. Click **Create**. Copilot Studio generates a **redirect URL** (`https://global.consent.azure-apim.net/redirect/generated-path` — `apim.net`, connection-specific). Register the wildcard `https://global.consent.azure-apim.net/redirect/**` in **IAS App-2 → Single Sign-On → OpenID Connect Configuration → Redirect URIs** so it covers this and any recreated connection (otherwise copy the exact URL and re-add it every time the connection changes). **Do not touch Entra** — Copilot Studio calls IAS directly, so only IAS needs to trust this redirect (Entra already trusts IAS's callback from Step 1). After any connector/connection edit, **recreate the connection and wait ~1–2 min** (Power Platform caches metadata).
 
 ### 6. Fix the Content-Type in the auto-created custom connector
 
