@@ -50,3 +50,40 @@ Content-Type: application/json
     "clientInfo": { "name": "resttest", "version": "1.0" }
   }
 }
+
+### -------------------------------------------------------------------
+### STEP D — REFRESH-TOKEN ROTATION TEST (diagnose the Copilot Studio reauth issue)
+###
+### Goal: prove whether IAS rotates (one-time-use) refresh tokens. If it does, a
+### stale/duplicate refresh token yields HTTP 400 invalid_grant - the exact error
+### Copilot Studio's oauth2generic connection surfaces after some time.
+###
+### PREREQUISITE: request offline_access so the refresh token's validity follows the
+### configured RT lifetime instead of the ~12h session timeout. To get an RT with
+### offline_access, re-run STEP A's authorize URL with scope=openid%20offline_access
+### and redo STEP B, OR just run STEP D1 below - it upgrades the scope on first refresh.
+### -------------------------------------------------------------------
+
+### STEP D1: first refresh - uses the RT from STEP B. Expect HTTP 200 with a NEW
+### refresh_token and "scope":"openid offline_access". Note the new refresh_token.
+# @name refresh1
+POST https://{{iasHost}}/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={{token.response.body.refresh_token}}&client_id={{clientId}}&client_secret={{clientSecret}}&scope=openid offline_access
+
+### STEP D2: second refresh - REPLAY the SAME original RT from STEP B (do NOT use the
+### rotated one from D1). If rotation is ON, expect HTTP 400:
+###   {"error":"invalid_grant","error_description":"Refresh token is invalid or expired."}
+### That 400 == rotation is enforced == root cause of the Copilot Studio reauth failures.
+POST https://{{iasHost}}/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={{token.response.body.refresh_token}}&client_id={{clientId}}&client_secret={{clientSecret}}&scope=openid offline_access
+
+### STEP D3 (control): refresh with the ROTATED RT from D1 - expect HTTP 200 again.
+### This confirms the token chain itself is healthy; only the consumed RT is rejected.
+POST https://{{iasHost}}/oauth2/token
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token&refresh_token={{refresh1.response.body.refresh_token}}&client_id={{clientId}}&client_secret={{clientSecret}}&scope=openid offline_access
