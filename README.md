@@ -2,7 +2,7 @@
 
 A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through the **MCP Gateway** on SAP Integration Suite — one of two integration architectures explicitly **endorsed by SAP** in the [SAP API Policy](https://help.sap.com/doc/sap-api-policy/latest/en-US/API_Policy_latest.pdf).
 
-Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**.
+Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**. Part 5 scales the **Part 3** IAS pattern from one hand-built connector to **all 21** SAP MCP Gateway connectors, created unattended.
 
 > The principal-propagation / SSO steps shown here aren't limited to the MCP Gateway — the same identity chain (SAP IAS → Cloud Connector → X.509 → real ABAP user) applies to **any service running on SAP BTP** that fronts an on-premise backend. Using **SAP API Management** (with the **Integration Cell**) instead of the MCP Gateway would be another obvious choice.
 
@@ -12,6 +12,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 | 2 | [User authentication with Microsoft Entra ID](./guides/02-entra-id.md) | **OAuth 2.0 authorization code** with Entra ID; connect **directly** to the gateway | Real user — **Entra ID** | [▶️ watch](https://www.youtube.com/watch?v=jE-qlg2vZ6I) |
 | 3 | [User authentication with SAP IAS (federated to Entra ID)](./guides/03-sap-ias.md) | **SAP IAS** issues the token (Entra federated into IAS); the foundation for **on-prem principal propagation** | Real user — **SAP IAS** (SAP-native) | [▶️ watch](https://youtu.be/7Y4TH2DWIoo) |
 | 4 | [On-prem principal propagation to your own SAP backend](./guides/04-principal-propagation.md) | Swap SWAPI for **your on-prem SAP** (`API_BUSINESS_PARTNER`) via **Cloud Connector** — a Basic-Auth foil, then **end-to-end X.509 principal propagation** | Real user — **SAP IAS**, propagated to the **real ABAP user** on-prem | [▶️ watch](https://youtu.be/x64gVHRdVMQ) |
+| 5 | [Bulk connector automation](./guides/05-bulk-connector-automation.md) | Automate creating all 21 Copilot Studio MCP connectors for the SAP MCP Gateway endpoints via `pac connector create` (OAuth + custom C# script embedded in one call) | Real user — **SAP IAS** (same chain as Part 3) | — |
 
 ## Where to start
 
@@ -28,6 +29,10 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - [`verify-step1-discovery.http`](./http/verify-step1-discovery.http) · [`verify-step2-ias-token.http`](./http/verify-step2-ias-token.http) — REST Client snippets to verify the IAS flow (Part 3).
 - [`api-business-partner-openapi.yaml`](./openapi/api-business-partner-openapi.yaml) — the OpenAPI subset used to generate the MCP tools for the on-prem `API_BUSINESS_PARTNER` backend (Part 4).
 - [`principal-propagation.http`](./http/principal-propagation.http) — REST Client snippets to verify the backend (Basic-Auth foil) and the gateway calls (Part 4).
+- [`Generate-Connectors.py`](./scripts/Generate-Connectors.py) — generates per-connector `apiDefinition` / `apiProperties` / `settings` files for all 21 endpoints (Part 5).
+- [`Deploy-Connectors.ps1`](./scripts/Deploy-Connectors.ps1) — bulk `pac connector create` with `-Only` / `-Area` / `-Solution` and a secure IAS-secret prompt (Part 5).
+- [`Collect-Redirects.ps1`](./scripts/Collect-Redirects.ps1) — optional: list connector redirect URLs (Part 5).
+- [`integration-packages/`](./integration-packages/) — importable SAP Integration Suite content packages — example Sales / Finance / Procurement MCP Gateway flows, 1:1 with the 21 connectors (Part 5).
 - [`architecture-pp-flow.svg`](./assets/architecture-pp-flow.svg) — sequence diagram of the Part 4 end-to-end principal-propagation authentication flow.
 
 > The `.http` files ship with **placeholders only** — never commit real client secrets or authorization codes.

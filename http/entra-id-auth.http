@@ -5,7 +5,7 @@
 ### Replace the client secret and the authorization code with your own values.
 ### Do NOT commit real secrets or codes — they are single-use / sensitive.
 
-@tenant = ee9157fe-19b9-4e21-85da-f093ed5df295
+@tenant = 00000000-0000-0000-0000-000000000000
 @clientId = 74612d5d-0ebb-4105-9ba4-4d33a0e73ce9
 @clientSecret = <your client secret>
 @redirectUri = http://localhost:8080/callback
