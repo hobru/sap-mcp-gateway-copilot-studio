@@ -41,7 +41,7 @@ https://<integration-host>/<CONNECTOR_NAME>
 Use `<integration-host>` as the placeholder for your Integration Suite runtime host. In this walkthrough the example host is:
 
 ```
-mcaps-ai-poc-a5t0we0l-5300db60212d41f88f074ea89f84d0fa.a.integration.cloud.sap
+mcaps-xxxxxxxx-cloud.sap
 ```
 
 The endpoints group into three functional areas:
@@ -92,6 +92,20 @@ For example, `SAP Sales - Sales Order - MCP` or `SAP Procurement - Purchase Orde
 
 ---
 
+## Importable example packages
+
+Three ready-made **SAP Integration Suite content packages** live in [`../integration-packages/`](../integration-packages/). They map **1:1 to the 21 endpoints** above — Sales (7), Finance (6), Procurement (8) — so you can stand up the MCP Gateway side quickly before you create the connectors:
+
+| Package | Flows | Area |
+|---|---|---|
+| [`BPS-Agents-Sales.zip`](../integration-packages/BPS-Agents-Sales.zip) | 7 | Sales |
+| [`BPS-Agents-Finance.zip`](../integration-packages/BPS-Agents-Finance.zip) | 6 | Finance |
+| [`BPS-Agents-Procurement.zip`](../integration-packages/BPS-Agents-Procurement.zip) | 8 | Procurement |
+
+Import each package via **Integration Suite → Design → Integrations and APIs → (Actions) → Import integration package**, then deploy the flows. Each deployed flow is one MCP Gateway endpoint, fronted by one of the connectors below. See [`integration-packages/README.md`](../integration-packages/README.md) for the full flow list and import steps.
+
+---
+
 ## Prerequisites
 
 - The **Part 3 setup** working end to end: Copilot Studio → Entra ID → **IAS** → MCP Gateway validating the IAS-issued token and reading `mail`. See the [IAS guide](./03-sap-ias.md).
@@ -108,12 +122,12 @@ Every connector uses the **same** SAP IAS OAuth 2.0 (authorization code) configu
 
 | Setting | Value |
 |---|---|
-| Authorization URL | `https://my400173.accounts.ondemand.com/oauth2/authorize` |
-| Token URL | `https://my400173.accounts.ondemand.com/oauth2/token` |
-| Refresh URL | `https://my400173.accounts.ondemand.com/oauth2/token` |
+| Authorization URL | `https://myXXXXXX.accounts.ondemand.com/oauth2/authorize` |
+| Token URL | `https://myXXXXXX.accounts.ondemand.com/oauth2/token` |
+| Refresh URL | `https://myXXXXXX.accounts.ondemand.com/oauth2/token` |
 | Scope | `openid email profile offline_access` |
-| Power Platform environment | `ee9157fe-19b9-4e21-85da-f093ed5df295` (BPS Agent Hub) |
-| Client id | `6c474ed0-459e-4dda-97c6-62535ea9e009` |
+| Power Platform environment | `00000000-0000-0000-0000-000000000000` (BPS Agent Hub) |
+| Client id | `11111111-1111-1111-1111-111111111111` |
 | Client secret | **entered at runtime only** — via the `Deploy-Connectors.ps1` secure prompt |
 
 Notes:
@@ -153,20 +167,20 @@ python scripts/Generate-Connectors.py
 Deploy one connector:
 
 ```powershell
-./scripts/Deploy-Connectors.ps1 -Environment ee9157fe-19b9-4e21-85da-f093ed5df295 -Only MCP_SALES_SALES_ORDER_SRV
+./scripts/Deploy-Connectors.ps1 -Environment 00000000-0000-0000-0000-000000000000 -Only MCP_SALES_SALES_ORDER_SRV
 ```
 
 Deploy a whole area:
 
 ```powershell
-./scripts/Deploy-Connectors.ps1 -Environment ee9157fe-19b9-4e21-85da-f093ed5df295 -Area Procurement
+./scripts/Deploy-Connectors.ps1 -Environment 00000000-0000-0000-0000-000000000000 -Area Procurement
 ```
 
 Deploy into a specific solution, or all 21 at once:
 
 ```powershell
 # all 21, grouped into a solution
-./scripts/Deploy-Connectors.ps1 -Environment ee9157fe-19b9-4e21-85da-f093ed5df295 -Solution SapMcpConnectors
+./scripts/Deploy-Connectors.ps1 -Environment 00000000-0000-0000-0000-000000000000 -Solution SapMcpConnectors
 ```
 
 `-Only` targets a single connector, `-Area` a functional group (Sales / Finance / Procurement), and `-Solution` bundles the connectors into a Power Platform solution; with none of the filters it processes **all 21**. In every case the script **prompts for the IAS client secret securely** (a masked prompt) and passes it to `pac connector create` — the secret is never echoed, stored, or committed.

@@ -32,6 +32,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - [`Generate-Connectors.py`](./scripts/Generate-Connectors.py) — generates per-connector `apiDefinition` / `apiProperties` / `settings` files for all 21 endpoints (Part 5).
 - [`Deploy-Connectors.ps1`](./scripts/Deploy-Connectors.ps1) — bulk `pac connector create` with `-Only` / `-Area` / `-Solution` and a secure IAS-secret prompt (Part 5).
 - [`Collect-Redirects.ps1`](./scripts/Collect-Redirects.ps1) — optional: list connector redirect URLs (Part 5).
+- [`integration-packages/`](./integration-packages/) — importable SAP Integration Suite content packages — example Sales / Finance / Procurement MCP Gateway flows, 1:1 with the 21 connectors (Part 5).
 - [`architecture-pp-flow.svg`](./assets/architecture-pp-flow.svg) — sequence diagram of the Part 4 end-to-end principal-propagation authentication flow.
 
 > The `.http` files ship with **placeholders only** — never commit real client secrets or authorization codes.
