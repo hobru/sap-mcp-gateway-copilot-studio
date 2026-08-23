@@ -2,7 +2,7 @@
 
 A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through the **MCP Gateway** on SAP Integration Suite — one of two integration architectures explicitly **endorsed by SAP** in the [SAP API Policy](https://help.sap.com/doc/sap-api-policy/latest/en-US/API_Policy_latest.pdf).
 
-Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**. Part 5 scales the **Part 3** IAS pattern from one hand-built connector to **all 21** SAP MCP Gateway connectors, created unattended.
+Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**. Part 5 scales the **Part 3** IAS pattern from one hand-built connector to **all 21** SAP MCP Gateway connectors, created unattended. Part 6 takes a **different, lighter architecture**: the MCP server runs **inside your ABAP system** (the [`abap-ai/mcp2`](https://github.com/abap-ai/mcp2) SDK), fronted by the [BTP Router app](https://github.com/hobru/CAP-Routing-App) for the **same** SSO + principal-propagation chain.
 
 > The principal-propagation / SSO steps shown here aren't limited to the MCP Gateway — the same identity chain (SAP IAS → Cloud Connector → X.509 → real ABAP user) applies to **any service running on SAP BTP** that fronts an on-premise backend. Using **SAP API Management** (with the **Integration Cell**) instead of the MCP Gateway would be another obvious choice.
 
@@ -13,6 +13,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 | 3 | [User authentication with SAP IAS (federated to Entra ID)](./guides/03-sap-ias.md) | **SAP IAS** issues the token (Entra federated into IAS); the foundation for **on-prem principal propagation** | Real user — **SAP IAS** (SAP-native) | [▶️ watch](https://youtu.be/7Y4TH2DWIoo) |
 | 4 | [On-prem principal propagation to your own SAP backend](./guides/04-principal-propagation.md) | Swap SWAPI for **your on-prem SAP** (`API_BUSINESS_PARTNER`) via **Cloud Connector** — a Basic-Auth foil, then **end-to-end X.509 principal propagation** | Real user — **SAP IAS**, propagated to the **real ABAP user** on-prem | [▶️ watch](https://youtu.be/x64gVHRdVMQ) |
 | 5 | [Bulk connector automation](./guides/05-bulk-connector-automation.md) | Automate creating all 21 Copilot Studio MCP connectors for the SAP MCP Gateway endpoints via `pac connector create` (OAuth + custom C# script embedded in one call) | Real user — **SAP IAS** (same chain as Part 3) | — |
+| 6 | [Your own ABAP MCP server (`zmcp2`) via the BTP Router](./guides/06-abap-mcp-server-btp-router.md) | Run the MCP server **inside ABAP** ([`abap-ai/mcp2`](https://github.com/abap-ai/mcp2)) and front it with the [BTP Router](https://github.com/hobru/CAP-Routing-App) — a lighter alternative to the Integration Suite MCP Gateway | Real user — **SAP IAS**, propagated to the **real ABAP user** on-prem | [▶️ watch](https://youtu.be/az4TIbpmMFI) |
 
 ## Where to start
 
@@ -20,6 +21,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - **Already have the MCP server?** Jump to **Part 2** (Entra ID) or **Part 3** (SAP IAS).
 - Parts 2 and 3 give the same result at the gateway — *user context* — but only the **IAS** token (Part 3) can travel further into SAP for on-prem principal propagation.
 - **Want end-to-end user identity into your own SAP backend?** **Part 4** builds directly on Part 3 — same front door, real on-prem execution as the signed-in user.
+- **Want to run the MCP server inside ABAP instead?** **Part 6** uses the [`abap-ai/mcp2`](https://github.com/abap-ai/mcp2) SDK plus the [BTP Router](https://github.com/hobru/CAP-Routing-App) — a fast, lighter path for trials and PoCs that reuses the same identity chain.
 
 ## Supporting artifacts
 
