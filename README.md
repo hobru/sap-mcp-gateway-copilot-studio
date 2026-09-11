@@ -1,6 +1,6 @@
 # SAP × Microsoft Copilot Studio — MCP Gateway guides
 
-A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through the **MCP Gateway** on SAP Integration Suite — one of two integration architectures explicitly **endorsed by SAP** in the [SAP API Policy](https://help.sap.com/doc/sap-api-policy/latest/en-US/API_Policy_latest.pdf).
+A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through the **MCP Gateway** on SAP Integration Suite — one of two integration architectures explicitly **endorsed by SAP** in the [SAP API Policy](https://help.sap.com/doc/sap-api-policy/latest/en-US/API_Policy_latest.pdf). (find more details in the SAP Architecture Center [here](https://architecture.learning.sap.com/docs/ref-arch/d2e34e))
 
 Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**. Part 5 scales the **Part 3** IAS pattern from one hand-built connector to **all 21** SAP MCP Gateway connectors, created unattended. Part 6 takes a **different, lighter architecture**: the MCP server runs **inside your ABAP system** (the [`abap-ai/mcp2`](https://github.com/abap-ai/mcp2) SDK), fronted by the [BTP Router app](https://github.com/hobru/CAP-Routing-App) for the **same** SSO + principal-propagation chain.
 
