@@ -359,7 +359,14 @@ If you prefer to keep credentials in the integration flow rather than the Destin
 
 ## Appendix — Business Partner OpenAPI → MCP tools
 
-The MCP tools in this walkthrough (`getBusinessPartners`, `getBusinessPartner`) come from an OpenAPI subset of `API_BUSINESS_PARTNER` — see [`api-business-partner-openapi.yaml`](../openapi/api-business-partner-openapi.yaml). Regenerate the MCP server from this spec exactly as in the first guide; only the **backend receiver** and **Destination** differ.
+The MCP tools in this walkthrough come from the focused
+[`api-business-partner-simple.yaml`](../openapi/api-business-partner-simple.yaml)
+contract. Select only its two GET operations for this read-only walkthrough.
+The sanitized
+[`api-business-partner-full.yaml`](../openapi/api-business-partner-full.yaml)
+export is included for reference, but should not be exposed wholesale as MCP
+tools. Regenerate the MCP server from the focused contract exactly as in the
+first guide; only the **backend receiver** and **Destination** differ.
 
 ---
 

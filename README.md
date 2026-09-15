@@ -4,6 +4,8 @@ A step-by-step series on connecting **Microsoft Copilot Studio** to SAP through 
 
 Each part builds on the previous one. In Parts 1–3 the MCP server stays the same (the public **Star Wars API**, same exposed tools) and what changes is **how identity flows to SAP**; Part 4 keeps that identity chain and swaps the **backend** for **your own on-premise SAP system**, running each call as the **real ABAP user**. Part 5 scales the **Part 3** IAS pattern from one hand-built connector to **all 21** SAP MCP Gateway connectors, created unattended. Part 6 takes a **different, lighter architecture**: the MCP server runs **inside your ABAP system** (the [`abap-ai/mcp2`](https://github.com/abap-ai/mcp2) SDK), fronted by the [BTP Router app](https://github.com/hobru/CAP-Routing-App) for the **same** SSO + principal-propagation chain.
 
+Part 7 returns to Integration Suite and adds the missing write path. A URL-based **OData API artifact** calls `API_BUSINESS_PARTNER` with a dedicated SAP communication user stored in Integration Suite security material and handles the backend CSRF-token exchange. The caller still uses the established Entra ID-federated IAS sign-in, while the MCP client never handles SAP credentials, cookies, or CSRF tokens.
+
 > The principal-propagation / SSO steps shown here aren't limited to the MCP Gateway — the same identity chain (SAP IAS → Cloud Connector → X.509 → real ABAP user) applies to **any service running on SAP BTP** that fronts an on-premise backend. Using **SAP API Management** (with the **Integration Cell**) instead of the MCP Gateway would be another obvious choice.
 
 | # | Guide | What it adds | Identity at the gateway | Video |
@@ -14,6 +16,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 | 4 | [On-prem principal propagation to your own SAP backend](./guides/04-principal-propagation.md) | Swap SWAPI for **your on-prem SAP** (`API_BUSINESS_PARTNER`) via **Cloud Connector** — a Basic-Auth foil, then **end-to-end X.509 principal propagation** | Real user — **SAP IAS**, propagated to the **real ABAP user** on-prem | [▶️ watch](https://youtu.be/x64gVHRdVMQ) |
 | 5 | [Bulk connector automation](./guides/05-bulk-connector-automation.md) | Automate creating all 21 Copilot Studio MCP connectors for the SAP MCP Gateway endpoints via `pac connector create` (OAuth + custom C# script embedded in one call) | Real user — **SAP IAS** (same chain as Part 3) | — |
 | 6 | [Your own ABAP MCP server (`zmcp2`) via the BTP Router](./guides/06-abap-mcp-server-btp-router.md) | Run the MCP server **inside ABAP** ([`abap-ai/mcp2`](https://github.com/abap-ai/mcp2)) and front it with the [BTP Router](https://github.com/hobru/CAP-Routing-App) — a lighter alternative to the Integration Suite MCP Gateway | Real user — **SAP IAS**, propagated to the **real ABAP user** on-prem | [▶️ watch](https://youtu.be/az4TIbpmMFI) |
+| 7 | [Business Partner updates through an OData API artifact](./guides/07-business-partner-updates.md) | Use a URL-based OData receiver with stored backend credentials and automatic **CSRF-token handling**, prove GET + PATCH, then expose both as MCP tools | Real user at the gateway; dedicated **SAP communication user** in the backend | — |
 
 ## Where to start
 
@@ -22,6 +25,7 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - Parts 2 and 3 give the same result at the gateway — *user context* — but only the **IAS** token (Part 3) can travel further into SAP for on-prem principal propagation.
 - **Want end-to-end user identity into your own SAP backend?** **Part 4** builds directly on Part 3 — same front door, real on-prem execution as the signed-in user.
 - **Want to run the MCP server inside ABAP instead?** **Part 6** uses the [`abap-ai/mcp2`](https://github.com/abap-ai/mcp2) SDK plus the [BTP Router](https://github.com/hobru/CAP-Routing-App) — a fast, lighter path for trials and PoCs that reuses the same identity chain.
+- **Want to add updates while keeping user sign-in at the gateway?** **Part 7** reuses the Entra ID-federated IAS authentication from Part 3, uses stored credentials for the backend call, and delegates CSRF-token handling to a URL-based OData API artifact.
 
 ## Supporting artifacts
 
@@ -29,8 +33,10 @@ Each part builds on the previous one. In Parts 1–3 the MCP server stays the sa
 - [`custom-connector-script.csx`](./scripts/custom-connector-script.csx) — C# fix for the `Content-Type: application/json; charset=utf-8` rejection in the auto-created custom connector (Parts 2–3).
 - [`entra-id-auth.http`](./http/entra-id-auth.http) — REST Client snippets for the Entra ID OAuth flow (Part 2).
 - [`verify-step1-discovery.http`](./http/verify-step1-discovery.http) · [`verify-step2-ias-token.http`](./http/verify-step2-ias-token.http) — REST Client snippets to verify the IAS flow (Part 3).
-- [`api-business-partner-openapi.yaml`](./openapi/api-business-partner-openapi.yaml) — the OpenAPI subset used to generate the MCP tools for the on-prem `API_BUSINESS_PARTNER` backend (Part 4).
+- [`api-business-partner-simple.yaml`](./openapi/api-business-partner-simple.yaml) — the tested, focused OpenAPI contract recommended for Business Partner MCP tools (Parts 4 and 7).
+- [`api-business-partner-full.yaml`](./openapi/api-business-partner-full.yaml) — the sanitized full-scope `API_BUSINESS_PARTNER` export for reference; do not expose every operation as MCP tools without a deliberate authorization review.
 - [`principal-propagation.http`](./http/principal-propagation.http) — REST Client snippets to verify the backend (Basic-Auth foil) and the gateway calls (Part 4).
+- [`business-partner-updates.http`](./http/business-partner-updates.http) — REST Client sequence for reading through the OData API artifact, updating one demo BP, and reading it back with an IAS user token while Integration Suite authenticates separately to SAP (Part 7).
 - [`Generate-Connectors.py`](./scripts/Generate-Connectors.py) — generates per-connector `apiDefinition` / `apiProperties` / `settings` files for all 21 endpoints (Part 5).
 - [`Deploy-Connectors.ps1`](./scripts/Deploy-Connectors.ps1) — bulk `pac connector create` with `-Only` / `-Area` / `-Solution` and a secure IAS-secret prompt (Part 5).
 - [`Collect-Redirects.ps1`](./scripts/Collect-Redirects.ps1) — optional: list connector redirect URLs (Part 5).

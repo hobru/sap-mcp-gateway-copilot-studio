@@ -1,0 +1,63 @@
+### Business Partner read/update through an SAP Integration Suite OData API artifact
+###
+### The caller authenticates to Integration Suite with an SAP IAS bearer token
+### obtained through the established Entra ID-federated sign-in. The URL-based
+### OData receiver authenticates separately to SAP with a User Credentials
+### security-material alias. It fetches and forwards the backend CSRF token and
+### session cookies for PATCH; this client does not handle them.
+###
+### Obtain the IAS token through the established Entra ID -> IAS authorization
+### flow from Part 3. Run with the VS Code REST Client extension. Replace all
+### placeholders and use only a designated demo BP. Never commit tokens or SAP
+### credentials.
+
+@apiBaseUrl = https://<integration-cell-virtual-host>/business-partner
+@iasAccessToken = <IAS access token>
+@sapClient = <target SAP client>
+@businessPartner = <designated-demo-business-partner>
+@newSearchTerm = MCP-DEMO
+
+########################################################################
+### 1) Read through the API artifact as the signed-in user
+########################################################################
+
+# @name listBusinessPartners
+GET {{apiBaseUrl}}/A_BusinessPartner?$top=5&$select=BusinessPartner,BusinessPartnerFullName,SearchTerm1&$format=json&sap-client={{sapClient}}
+Authorization: Bearer {{iasAccessToken}}
+Accept: application/json
+Accept-Encoding: identity
+
+# @name getBusinessPartnerBefore
+GET {{apiBaseUrl}}/A_BusinessPartner('{{businessPartner}}')?$select=BusinessPartner,BusinessPartnerFullName,SearchTerm1&$format=json&sap-client={{sapClient}}
+Authorization: Bearer {{iasAccessToken}}
+Accept: application/json
+Accept-Encoding: identity
+
+########################################################################
+### 2) Update through the API artifact
+###    Expected response: 204 No Content.
+###    The wildcard bypasses optimistic concurrency and is suitable only for
+###    this controlled PoC. Use the entity ETag instead in production.
+########################################################################
+
+# @name updateBusinessPartner
+PATCH {{apiBaseUrl}}/A_BusinessPartner('{{businessPartner}}')?sap-client={{sapClient}}
+Authorization: Bearer {{iasAccessToken}}
+Accept: application/json
+Accept-Encoding: identity
+Content-Type: application/json
+If-Match: *
+
+{
+  "SearchTerm1": "{{newSearchTerm}}"
+}
+
+########################################################################
+### 3) Read back and confirm SearchTerm1
+########################################################################
+
+# @name getBusinessPartnerAfter
+GET {{apiBaseUrl}}/A_BusinessPartner('{{businessPartner}}')?$select=BusinessPartner,BusinessPartnerFullName,SearchTerm1&$format=json&sap-client={{sapClient}}
+Authorization: Bearer {{iasAccessToken}}
+Accept: application/json
+Accept-Encoding: identity
