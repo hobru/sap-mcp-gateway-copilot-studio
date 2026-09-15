@@ -1,0 +1,463 @@
+openapi: 3.0.0
+info:
+  title: SAP Business Partner Simple API
+  description: >-
+    Reduced API definition focused on simple SAP business partner create, read,
+    and update operations from API_BUSINESS_PARTNER.
+  version: 1.4.0
+  x-targetEndpoint: 'https://sap.example.com/sap/opu/odata/sap/API_BUSINESS_PARTNER'
+servers:
+  - url: >-
+      https://integration.example.com/business-partner
+tags:
+  - name: BusinessPartner
+    description: Business partner general data
+paths:
+  /A_BusinessPartner:
+    get:
+      operationId: listBusinessPartners
+      summary: List business partners
+      description: Retrieves business partner general data.
+      tags:
+        - BusinessPartner
+      parameters:
+        - $ref: '#/components/parameters/Top'
+        - $ref: '#/components/parameters/Skip'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Select'
+        - $ref: '#/components/parameters/SapClient'
+      responses:
+        '200':
+          description: Retrieved business partners
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessPartnerCollectionResponse'
+        default:
+          $ref: '#/components/responses/Error'
+    post:
+      operationId: createBusinessPartner
+      summary: Create business partner
+      description: Creates a simple business partner general-data record.
+      tags:
+        - BusinessPartner
+      parameters:
+        - $ref: '#/components/parameters/SapClient'
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        description: Business partner general data.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessPartnerCreate'
+      responses:
+        '201':
+          description: Created business partner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessPartnerResponse'
+        default:
+          $ref: '#/components/responses/Error'
+  '/A_BusinessPartner(''{BusinessPartner}'')':
+    parameters:
+      - name: BusinessPartner
+        in: path
+        required: true
+        description: Business partner number.
+        schema:
+          type: string
+          maxLength: 10
+    get:
+      operationId: getBusinessPartner
+      summary: Get business partner
+      description: Retrieves one business partner by business partner number.
+      tags:
+        - BusinessPartner
+      parameters:
+        - $ref: '#/components/parameters/Select'
+        - $ref: '#/components/parameters/SapClient'
+      responses:
+        '200':
+          description: Retrieved business partner
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BusinessPartnerResponse'
+        default:
+          $ref: '#/components/responses/Error'
+    patch:
+      operationId: updateBusinessPartner
+      summary: Update business partner
+      description: >-
+        Updates simple business partner general-data fields by business partner
+        number. For this controlled demo, always pass * as If_Match and do not
+        ask the user to provide an ETag.
+      tags:
+        - BusinessPartner
+      parameters:
+        - $ref: '#/components/parameters/IfMatch'
+        - $ref: '#/components/parameters/SapClient'
+        - $ref: '#/components/parameters/CsrfToken'
+      requestBody:
+        description: >-
+          Business partner fields to update. SAP OData V2 expects the data
+          inside the d wrapper for PATCH.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BusinessPartnerUpdateRequest'
+      responses:
+        '204':
+          description: Updated business partner
+        default:
+          $ref: '#/components/responses/Error'
+components:
+  schemas:
+    BusinessPartner:
+      type: object
+      properties:
+        BusinessPartner:
+          type: string
+          maxLength: 10
+          description: Business Partner Number
+        Customer:
+          type: string
+          maxLength: 10
+          description: Customer Number
+        Supplier:
+          type: string
+          maxLength: 10
+          description: Account Number of Supplier
+        BusinessPartnerCategory:
+          type: string
+          maxLength: 1
+          description: Business Partner Category
+        BusinessPartnerGrouping:
+          type: string
+          maxLength: 4
+          description: Business Partner Grouping
+        BusinessPartnerFullName:
+          type: string
+          maxLength: 81
+        BusinessPartnerName:
+          type: string
+          maxLength: 81
+        BusinessPartnerUUID:
+          type: string
+          format: uuid
+          description: Business Partner GUID
+        OrganizationBPName1:
+          type: string
+          maxLength: 40
+          description: Name 1 of organization
+        OrganizationBPName2:
+          type: string
+          maxLength: 40
+          description: Name 2 of organization
+        FirstName:
+          type: string
+          maxLength: 40
+          description: First Name of Business Partner (Person)
+        LastName:
+          type: string
+          maxLength: 40
+          description: Last Name of Business Partner (Person)
+        CorrespondenceLanguage:
+          type: string
+          maxLength: 2
+          description: 'Business Partner: Correspondence Language'
+        Language:
+          type: string
+          maxLength: 2
+          description: 'Business partner: Language'
+        SearchTerm1:
+          type: string
+          maxLength: 20
+          description: Search Term 1 for Business Partner
+        SearchTerm2:
+          type: string
+          maxLength: 20
+          description: Search Term 2 for Business Partner
+        BusinessPartnerType:
+          type: string
+          maxLength: 4
+          description: Business Partner Type
+        FormOfAddress:
+          type: string
+          maxLength: 4
+          description: Form-of-Address Key
+        IsNaturalPerson:
+          type: string
+          maxLength: 1
+          description: Business Partner Is a Natural Person Under the Tax Laws
+        GenderCodeName:
+          type: string
+          maxLength: 1
+          description: Sex of business partner (person)
+        BusinessPartnerIsBlocked:
+          type: boolean
+          description: Central Block for Business Partner
+        CreatedByUser:
+          type: string
+          maxLength: 12
+          description: User who created the object
+        CreationDate:
+          type: string
+          description: Date on which the object was created
+        LastChangeDate:
+          type: string
+          description: Date when object was last changed
+        LastChangedByUser:
+          type: string
+          maxLength: 12
+          description: Last user to change object
+        ETag:
+          type: string
+          maxLength: 26
+    BusinessPartnerCreate:
+      type: object
+      properties:
+        BusinessPartner:
+          type: string
+          maxLength: 10
+          description: Business partner number.
+        BusinessPartnerCategory:
+          type: string
+          maxLength: 1
+          description: >-
+            Business partner category. Common SAP values are 1 person, 2
+            organization, 3 group.
+        BusinessPartnerGrouping:
+          type: string
+          maxLength: 4
+          description: Business Partner Grouping
+        OrganizationBPName1:
+          type: string
+          maxLength: 40
+          description: Name 1 of organization
+        OrganizationBPName2:
+          type: string
+          maxLength: 40
+          description: Name 2 of organization
+        FirstName:
+          type: string
+          maxLength: 40
+          description: First Name of Business Partner (Person)
+        LastName:
+          type: string
+          maxLength: 40
+          description: Last Name of Business Partner (Person)
+        CorrespondenceLanguage:
+          type: string
+          maxLength: 2
+          description: 'Business Partner: Correspondence Language'
+        Language:
+          type: string
+          maxLength: 2
+          description: 'Business partner: Language'
+        SearchTerm1:
+          type: string
+          maxLength: 20
+          description: Search Term 1 for Business Partner
+        SearchTerm2:
+          type: string
+          maxLength: 20
+          description: Search Term 2 for Business Partner
+        BusinessPartnerType:
+          type: string
+          maxLength: 4
+          description: Business Partner Type
+        FormOfAddress:
+          type: string
+          maxLength: 4
+          description: Form-of-Address Key
+        IsNaturalPerson:
+          type: string
+          maxLength: 1
+          description: Business Partner Is a Natural Person Under the Tax Laws
+        GenderCodeName:
+          type: string
+          maxLength: 1
+          description: Sex of business partner (person)
+        BusinessPartnerIsBlocked:
+          type: boolean
+          description: Central Block for Business Partner
+      description: Simple business partner general data for creation.
+      required:
+        - BusinessPartner
+    BusinessPartnerUpdate:
+      type: object
+      properties:
+        BusinessPartnerCategory:
+          type: string
+          maxLength: 1
+          description: Business Partner Category
+        BusinessPartnerGrouping:
+          type: string
+          maxLength: 4
+          description: Business Partner Grouping
+        OrganizationBPName1:
+          type: string
+          maxLength: 40
+          description: Name 1 of organization
+        OrganizationBPName2:
+          type: string
+          maxLength: 40
+          description: Name 2 of organization
+        FirstName:
+          type: string
+          maxLength: 40
+          description: First Name of Business Partner (Person)
+        LastName:
+          type: string
+          maxLength: 40
+          description: Last Name of Business Partner (Person)
+        CorrespondenceLanguage:
+          type: string
+          maxLength: 2
+          description: 'Business Partner: Correspondence Language'
+        Language:
+          type: string
+          maxLength: 2
+          description: 'Business partner: Language'
+        SearchTerm1:
+          type: string
+          maxLength: 20
+          description: Search Term 1 for Business Partner
+        SearchTerm2:
+          type: string
+          maxLength: 20
+          description: Search Term 2 for Business Partner
+        BusinessPartnerType:
+          type: string
+          maxLength: 4
+          description: Business Partner Type
+        FormOfAddress:
+          type: string
+          maxLength: 4
+          description: Form-of-Address Key
+        IsNaturalPerson:
+          type: string
+          maxLength: 1
+          description: Business Partner Is a Natural Person Under the Tax Laws
+        GenderCodeName:
+          type: string
+          maxLength: 1
+          description: Sex of business partner (person)
+        BusinessPartnerIsBlocked:
+          type: boolean
+          description: Central Block for Business Partner
+      description: Simple business partner general data fields for update.
+    BusinessPartnerUpdateRequest:
+      type: object
+      required:
+        - d
+      properties:
+        d:
+          $ref: '#/components/schemas/BusinessPartnerUpdate'
+    BusinessPartnerResponse:
+      type: object
+      properties:
+        d:
+          $ref: '#/components/schemas/BusinessPartner'
+    BusinessPartnerCollection:
+      type: object
+      properties:
+        __count:
+          type: string
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BusinessPartner'
+    BusinessPartnerCollectionResponse:
+      type: object
+      properties:
+        d:
+          $ref: '#/components/schemas/BusinessPartnerCollection'
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+            message:
+              type: object
+              properties:
+                lang:
+                  type: string
+                value:
+                  type: string
+  parameters:
+    Top:
+      name: $top
+      in: query
+      description: Maximum number of records to return.
+      schema:
+        type: integer
+    Skip:
+      name: $skip
+      in: query
+      description: Number of records to skip.
+      schema:
+        type: integer
+    Filter:
+      name: $filter
+      in: query
+      description: 'OData filter expression, for example BusinessPartner eq ''1000001''.'
+      schema:
+        type: string
+    Select:
+      name: $select
+      in: query
+      description: Comma-separated list of properties to return.
+      schema:
+        type: string
+    SapClient:
+      name: sap-client
+      in: query
+      description: SAP client.
+      schema:
+        type: string
+    CsrfToken:
+      name: x-csrf-token
+      in: header
+      description: CSRF token required for modifying requests.
+      schema:
+        type: string
+    IfMatch:
+      name: If-Match
+      in: header
+      required: true
+      description: >-
+        ETag value for optimistic concurrency control. For this controlled demo,
+        always use * and do not ask the user to provide an ETag. In production,
+        use the ETag returned by a preceding read.
+      example: '*'
+      x-ms-summary: 'For this controlled demo, always use * and do not ask the user.'
+      x-ms-visibility: internal
+      schema:
+        type: string
+        default: '*'
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  securitySchemes:
+    openId:
+      type: openIdConnect
+      description: >-
+        OpenID Connect is a security scheme used for authentication and
+        authorization based on the OpenID Connect protocol. It enables clients
+        to verify the identity of end users through an authorization server and
+        to access basic profile information about the authenticated user.
+      openIdConnectUrl: 'https://ias.example.com/.well-known/openid-configuration'
+security:
+  - openId: []
