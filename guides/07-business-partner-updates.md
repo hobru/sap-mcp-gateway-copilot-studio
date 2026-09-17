@@ -201,7 +201,7 @@ The result must be an **OData** artifact with a **URL-based** target.
 
 
 
-7. Choose **Add and Open in API Designer**.
+7. Click on **Edit** and switch to **Policies**
 
 Under **Policies**, select the connection immediately before **Target**. Confirm:
 
