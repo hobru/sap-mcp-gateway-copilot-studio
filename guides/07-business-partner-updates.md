@@ -177,7 +177,7 @@ The result must be an **OData** artifact with a **URL-based** target.
 
 1. Open **Design -> Integrations and APIs**.
 2. Open the package used for the MCP Gateway series and choose **Edit**.
-3. Choose **Artifacts -> Add -> API**.
+3. Choose **Artifacts -> Add -> URL or Specification**.
 4. Select the **Integration Cell** runtime profile.
 5. Upload the Business Partner API definition.
 6. On **Provide API Details**, enter:
@@ -194,6 +194,9 @@ The result must be an **OData** artifact with a **URL-based** target.
    | API Version | `1.0.0` |
    | Runtime Profile | `Integration Cell` |
    | Virtual Host | The Integration Cell virtual host used for the MCP endpoints |
+
+
+> ℹ️ Make sure to select the Servie Type as **ODATA**
 
 ![Enter the credential alias and SAP communication-user details](../assets/part7/07-security-material-03.png)
 
