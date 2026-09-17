@@ -481,10 +481,7 @@ the Business Partner, performs the requested field update, and confirms that no
 other fields were changed.
 
 > [!NOTE]
-> This screenshot was captured during an earlier successful tenant test using
-> `SearchTerm2`. The published OpenAPI contract and MCP tool in this guide
-> intentionally expose only `SearchTerm1`; the end-to-end invocation flow is
-> otherwise the same.
+> You might need to update the custom connector to rewrite the Header like done in previous steps. 
 
 ![Successful Business Partner update from Copilot Studio through the Integration Suite MCP server](../assets/part7/07-copilot-studio-success.png)
 
