@@ -177,10 +177,14 @@ The result must be an **OData** artifact with a **URL-based** target.
 
 1. Open **Design -> Integrations and APIs**.
 2. Open the package used for the MCP Gateway series and choose **Edit**.
-3. Choose **Artifacts -> Add -> URL or Specification**.
+3. Choose **Artifacts -> Add -> API -> Runtime Profile**.
 4. Select the **Integration Cell** runtime profile.
-5. Upload the Business Partner API definition.
-6. On **Provide API Details**, enter:
+5. Select Methos **URL or Specification**
+6. Upload the [Business Partner API definition](https://github.com/hobru/sap-mcp-gateway-copilot-studio/blob/main/openapi/api-business-partner-simple.yaml). (start with the simplified version; the full Business Partner Spec is quite big and can cause the browser window to crash / wait)
+
+> ℹ️ Make sure to select the Servie Type as **ODATA**
+
+7. On **Provide API Details**, enter and click on **Add**:
 
    | Field | Value |
    |---|---|
@@ -196,7 +200,6 @@ The result must be an **OData** artifact with a **URL-based** target.
    | Virtual Host | The Integration Cell virtual host used for the MCP endpoints |
 
 
-> ℹ️ Make sure to select the Servie Type as **ODATA**
 
 ![Enter the credential alias and SAP communication-user details](../assets/part7/07-security-material-03.png)
 
@@ -204,7 +207,7 @@ The result must be an **OData** artifact with a **URL-based** target.
 
 
 
-7. Click on **Edit** and switch to **Policies**
+8. Click on **Edit** and switch to **Policies**
 
 Under **Policies**, select the connection immediately before **Target**. Confirm:
 
