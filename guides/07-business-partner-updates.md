@@ -12,6 +12,8 @@ The URL-based OData receiver automatically obtains the backend CSRF token,
 retains the corresponding session cookies, and sends both with the modifying
 request. Copilot Studio never handles SAP Gateway CSRF tokens or cookies.
 
+Watch the related video [here](https://www.youtube.com/watch?v=jP9r2HfOgyI)
+
 > [!IMPORTANT]
 > SAP documents that [URL-based OData receivers for API
 > artifacts](https://help.sap.com/docs/SAP_INTEGRATION_SUITE/9519789d5664487f8b9cd89eba514477/c34c22f3335641fe991166c8c2a0b27a.html)
